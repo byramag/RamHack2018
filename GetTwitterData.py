@@ -1,22 +1,9 @@
-from TwitterSearch import *
-try:
-    tso = TwitterSearchOrder() # create a TwitterSearchOrder object
-    tso.set_keywords(['Guttenberg', 'Doktorarbeit']) # let's define all words we would like to have a look for
-    tso.set_language('de') # we want to see German tweets only
-    tso.set_include_entities(False) # and don't give us all those entity information
+from searchtweets import ResultStream, gen_rule_payload, load_credentials, collect_results
 
-    # it's about time to create a TwitterSearch object with our secret tokens
-    ts = TwitterSearch(
-        consumer_key = 'aaabbb',
-        consumer_secret = 'cccddd',
-        access_token = '111222',
-        access_token_secret = '333444'
-     )
+rule = gen_rule_payload("beyonce", results_per_call=100) # testing with a sandbox account
 
-     # this is where the fun actually starts :)
-    for tweet in ts.search_tweets_iterable(tso):
-        print( '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
+#enterprise_search_args = load_credentials("~/.twitter_keys.yaml", yaml_key="search_tweets_enterprise", env_overwrite=False)
 
-except TwitterSearchException as e: # take care of all those ugly errors if there are some
-    print(e)
+tweets = collect_results(rule, max_results=100)#,result_stream_args=enterprise_search_args) # change this if you need to
 
+[print(tweet.all_text, end='\n\n') for tweet in tweets[0:10]]
